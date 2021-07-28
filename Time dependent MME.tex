@@ -1,0 +1,522 @@
+\documentclass[10pt]{article}
+\usepackage{color}
+\usepackage{tikz}
+
+
+\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage[font=small]{caption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage[a4paper,margin=0.75in,footskip=0.25in]{geometry}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{bm}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{braket}
+\usepackage{dsfont}
+\graphicspath{{Images/}}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+%\addtolength{\oddsidemargin}{-1.5in}
+%\addtolength{\evensidemargin}{-1.5in}
+%\addtolength{\textwidth}{1.75in}
+%\addtolength{\topmargin}{-.7in}
+%\addtolength{\textheight}{1.75in}
+
+\lstset{language=Python}
+
+\setlength{\columnsep}{1cm}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{1em}
+
+\numberwithin{equation}{section}
+
+\begin{document}
+
+\author{David Strachan}
+\title{\textbf{Time Periodic Lindblad Equation}}
+
+\maketitle
+\section{Cumulant expansion}
+Consider the hamiltonian of a system weakly coupled to a bath,
+\begin{equation}
+H = H_{S}(t) + H_{B} + \lambda H_{SB} 
+\end{equation}
+where $H_{S}(t)$ is the time periodic system hamiltonian (period $\Theta$) and
+\begin{equation}
+H_{SB} = A\otimes B.
+\end{equation}
+going into the interaction picture, we have the hamiltonian 
+\begin{equation}
+\tilde{H}(t) = U^{\dagger}_{S}(t)AU_{S}(t)\otimes U^{\dagger}_{B}(t)BU_{B}(t) \equiv A(t) \otimes B(t).
+\end{equation}
+In the interaction picture, the density matrix satisfies 
+\begin{equation} \label{eq:1}
+\frac{d}{dt}\tilde{\rho}_{SB}(t) = -i[\lambda\tilde{H}(t),\tilde{\rho}_{SB}(t)]
+\end{equation}
+Integrating \ref{eq:1} and iterating the expression leads to a power series in $\lambda$,
+
+\begin{align}
+\tilde{\rho}_{SB}(t) &= \tilde{\rho}_{SB}(0) -i\int_0^t ds[\lambda\tilde{H}(t),\tilde{\rho}_{SB}(s)] \\
+			     &=   \tilde{\rho}_{SB}(0) -i\lambda\int_0^t ds[\tilde{H}(t),\tilde{\rho}_{SB}(0)] +(-i\lambda)^2\int_0^t ds\int_0^s ds'[\tilde{H}(s),[\tilde{H}(s'),\tilde{\rho}_{SB}(0)]] +...,
+\end{align}
+We now use the first approximation of weak coupling, and we neglect terms of third order or above. This is equation 448b in https://arxiv.org/abs/1902.00967 (the lecture notes). The derivation is the same up until equation 458, so I will start again from there. In the time independent case, the operator $A(t)$ is expressed in the frequency domain of $H_{S}$. This can't be done in the time periodic case as $H_{S}$ doesn't have a fixed basis. We can overcome this issue by using Floquet theory. Consider the system's schrodinger equation, 
+\begin{equation} \label{eq:2}
+H_{S}(t)\Psi(t) = i\hbar \frac{\partial}{\partial t} \Psi(t).
+\end{equation}
+According to the Floquet theorem, there exist solutions to \ref{eq:2} of the form
+\begin{equation} \label{eq:19}
+\Psi_{\alpha}(t) = \rm exp(-i\epsilon_{\alpha}t/\hbar)\Phi_{\alpha}(t),
+\end{equation}
+where $\Phi_{\alpha}(t)$ are periodic. These solutions form a basis,
+\begin{equation}
+\Psi(t) = \sum_{\alpha} c_{\alpha} \Psi_{\alpha}(t) = \sum_{\alpha} c_{\alpha} \rm exp(-i\epsilon_{\alpha}t/\hbar)\Phi_{\alpha}(t).
+\end{equation}
+Now consider the propagator for the system, which by definition satisfies
+\begin{equation}
+U_{S}(t_2 + t_1,t_1)\Psi(t_1) = \Psi(t_2+t_1).
+\end{equation}
+Inserting the Floquet states into this equation and setting $t_1=0$, noting that $\Psi_{\alpha}(0)=\Phi_{\alpha}(0)$ leads to 
+\begin{equation} \label{eq:3}
+U_{S}(t,0)\Phi_{\alpha}(0) = \rm exp(-i\epsilon_{\alpha}t/\hbar)\Phi_{\alpha}(t).
+\end{equation}
+$\Phi_{\alpha}(t)$ can be decomposed into its discrete fourier components (the discrete decomposition follows from the periodic boundary conditions), given by 
+\begin{equation} \label{eq:4}
+\Phi_{\alpha}(t) = \sum_{q \in\mathbb{Z}}  \Phi_{\alpha}^{q} \rm  e^{iq\Omega t}  
+\end{equation}
+the set $\Psi_{\alpha}(0)$ form a basis for $t=0$, and we can express the operator A in this basis as follows,
+\begin{align} \label{eq:5}
+A(t) =  U^{\dagger}_{S}(t,0)AU_{S}(t,0) &= \sum_{\alpha,\beta} U^{\dagger}_{S}(t,0)\ket{\Psi_{\alpha}(0)}\bra{\Psi_{\alpha}(0)}A\ket{\Psi_{\beta}(0)}\bra{\Psi_{\beta}(0)}U_{S}(t,0) \\
+                                                       &=   \sum_{\alpha,\beta} U^{\dagger}_{S}(t,0)\ket{\Phi_{\alpha}(0)}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}(0)}U_{S}(t,0).
+\end{align}
+Substituting equations \ref{eq:3} and \ref{eq:4} into this expression for $A(t)$ leads to \footnote{Unsure of whether $\Phi_{\alpha}^{q}$ can be written as $\ket{\Phi_{\alpha}^{q}}$.}
+\begin{align}
+A(t) &= \sum_{\alpha,\beta}\sum_{q,q'}e^{it(\epsilon_{\alpha}/\hbar - q\Omega)}\ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}}e^{-it(\epsilon_{\beta}/\hbar - q'\Omega)} \\
+      &=  \sum_{\alpha,\beta}\sum_{q,q'}e^{i((\epsilon_{\alpha}-\epsilon_{\beta})/\hbar + (q'-q)\Omega)t}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\beta}^{q'}}\\
+      &=   \sum_{p \in\mathbb{Z}} \sum_{\omega} e^{i(\omega + p\Omega)t} A_{p\omega},
+\end{align}
+where 
+\begin{equation}
+A_{p\omega} =  \sum_{q'-q = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  \bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\beta}^{q'}}.
+\end{equation}
+Using equations 453 and 454c from the lecture notes, this leads to the following map from time 0 to t:
+\begin{equation}
+K^{2}(t)\tilde{\rho}(0) =  \sum_{p,p'} \sum_{\omega,\omega '}\mathcal{B}^{\omega\omega '}_{pp'}(t)\bigg[A_{p\omega}\tilde{\rho}(0)A_{p'\omega '}^{\dagger} - A_{p'\omega '}^{\dagger}A_{p\omega} \tilde{\rho}(0)\bigg] + h.c.
+\end{equation}
+where 
+\begin{equation} \label{eq:9}
+\mathcal{B}_{\omega\omega '}^{pp'}(t) = \int_0^t ds \int_0^s ds'  e^{-i(\omega + p\Omega)s}e^{i(\omega ' + p'\Omega)s'}B(s,s').
+\end{equation}
+The derivation is then the same as the time independent case\footnote{See equations 471-477c in the lecture notes.}, leading to 
+\begin{equation}
+K^{2}(t)\tilde{\rho}(0) = -i[Q(t),\tilde{\rho}(0)] + \sum_{\omega\omega '}\sum_{pp'}b_{\omega\omega '}^{pp'}(t)\bigg[A_{p\omega}\tilde{\rho}(0)A_{p'\omega '}^{\dagger} - \frac{1}{2}\{A_{p'\omega'}^{\dagger}A_{p\omega},\tilde{\rho}(0)\}\bigg],
+\end{equation}
+where
+\begin{equation}
+Q(t) =  \sum_{\omega\omega '}\sum_{pp'}\frac{-i}{2}(\mathcal{B}_{\omega\omega '}^{pp'}(t)  - \mathcal{B}_{\omega\omega '}^{pp'\:*}(t))A_{p'\omega '}^{\dagger}A_{p\omega}
+\end{equation}
+is the lamb shift and 
+\begin{equation}\label{eq:6}
+b_{\omega\omega '}^{pp'}(t) = \int_0^t ds \int_0^t ds'  e^{-i(\omega + p\Omega)s}e^{i(\omega ' + p'\Omega)s'}B(s,s').
+\end{equation}
+
+The true quantum map is given by 
+\begin{equation}
+\tilde{\rho}(t) = e^{\lambda^{2}K^{2}(t)}\tilde{\rho}(0).
+\end{equation}
+Tayloring expanding this expression leads to 
+\begin{equation} \label{eq:7}
+\tilde{\rho}(t)-\tilde{\rho}(0) = K^{2}(t)\tilde{\rho}(0).
+\end{equation}
+To arrive at the Lindblad equation we now introduce a Markovian assumption for the coarse graining timescale $\tau$. We give the following coarse graining definition,
+\begin{equation}
+\langle X \rangle_{j} \equiv \frac{1}{\tau} \int_{j\tau}^{(j+1)\tau}X(s)ds.
+\end{equation}
+Dividing equation \ref{eq:7} by $\tau$ and setting $t=\tau$ leads to 
+\begin{equation}
+\langle \dot{\tilde{\rho}} \rangle_{0} =  -i[\lambda^{2}\langle \dot{Q} \rangle_{0} ,\tilde{\rho}(0)] + \sum_{\omega\omega '}\sum_{pp'}\lambda^{2} \langle \dot{b_{\omega\omega '}^{pp'}} \rangle_{0} \bigg[A_{p\omega}\tilde{\rho}(0)A_{p'\omega '}^{\dagger} - \frac{1}{2}\{A_{p'\omega'}^{\dagger}A_{p\omega},\tilde{\rho}(0)\}\bigg]
+\end{equation}
+The Markovian assumption is then to assume both $\langle \dot{Q} \rangle_{0}$ and  $\langle \dot{b_{\omega\omega '}^{pp'}} \rangle_{0}$ are constant for all t. This follows from the assumption that the bath correlation function is translationally invariant and that its single variable dependence is a quickly decaying exponential, i.e.
+\begin{equation} 
+B(s,s') = B(s-s') \sim e^{-|s-s'|/\tau_{B}}.
+\end{equation}
+$B(s,s') = B(s-s')$ can be shown to be true if $[H_{B},\rho_{B}(0)]=0$ which is the case for a stationary bath. To obtain the lindblad form we must make one final assumption, that $\tau$ is very small on the timescale over which $\tilde{\rho}(t)$ changes such that 
+\begin{equation}
+\langle \dot{\tilde{\rho}} \rangle_{j} = [\tilde{\rho}((j+1)\tau)-\tilde{\rho}(\tau)]/\tau \approx \dot{\tilde{\rho}}(t).
+\end{equation}
+This is summarised as 
+\begin{equation}
+\tau_{B}\ll\tau\ll\tau_{S}
+\end{equation}
+This leads to the interaction picture Lindblad equation
+\begin{equation} \label{eq:10}
+ \dot{\tilde{\rho}}(t)=  -i[H_{LS} ,\tilde{\rho}(t)] + \sum_{\omega\omega '}\sum_{pp'}\gamma_{\omega\omega'}^{pp'} \bigg[A_{p\omega}\tilde{\rho}(t)A_{p'\omega '}^{\dagger} - \frac{1}{2}\{A_{p'\omega'}^{\dagger}A_{p\omega},\tilde{\rho}(t)\}\bigg],
+\end{equation}
+where 
+\begin{equation} \label{eq:18}
+H_{LS} \equiv \lambda^{2}\langle \dot{Q} \rangle_{0},
+\end{equation}
+
+\begin{equation}
+\gamma_{\omega\omega'}^{pp'} \equiv \lambda^{2} \langle \dot{b_{\omega\omega '}^{pp'}} \rangle_{0}.
+\end{equation}
+We can simplify this result further by introducing the rotating wave approximation (RWA). Recall equations \ref{eq:6} and \ref{eq:9}, where the integrand falls off rapidly as s and s' differ due to the auto-correlation function $B(s-s')$. Taking the limit of $B(s-s')= B\delta(s-s')$ leads to 
+\begin{equation}\label{eq:8}
+b_{\omega\omega '}^{pp'}(t) = 2\mathcal{B}_{\omega\omega '}^{pp'}(t) = \int_0^t ds\:  e^{i(\omega'-\omega+ m\Omega)s}B,
+\end{equation} 
+
+where $m = p'-p$. The factor of 2 can be rationalised in two ways, either from equation 475 in the lecture notes or the fact that integration only goes up to s and not over s for $\mathcal{B}_{\omega\omega '}^{pp'}(t)$, and the fact that $B(s-s')$ is symmetric in s' about $s=s'$.  We can now invoke the RWA, where we note that terms with $\omega \neq \omega' +m\Omega$ are rapidly oscillating if $s \gg |\omega - \omega' -m\Omega|^{-1}$ and thus average to zero. This is clearly not valid in the lower band of the integral when s is very small, but in the limit of  $t\to \infty$ this correction becomes negligible. Under this assumption, we only retain  $\omega = \omega' +m\Omega$ terms which simplifies equation \ref{eq:10} leading to
+\begin{equation} \label{eq:11}
+ \dot{\tilde{\rho}}(t)=  -i[H_{LS} ,\tilde{\rho}(t)] + \sum_{\omega}\sum_{p}\gamma_{\omega}^{p} \bigg[A_{p\omega}\tilde{\rho}(t)A_{p\omega}^{\dagger} - \frac{1}{2}\{A_{p\omega}^{\dagger}A_{p\omega},\tilde{\rho}(t)\}\bigg],
+\end{equation}
+where $H_{LS}$ is defined as before, with
+\begin{equation} \label{eq:17}
+Q(t) = \sum_{\omega}\sum_{p}\frac{-i}{2}(\mathcal{B}_{\omega}^{p}(t)  - \mathcal{B}_{\omega}^{p\:*}(t))A_{p\omega}^{\dagger}A_{p\omega}
+\end{equation}
+\begin{equation}
+\gamma_{\omega}^{p} \equiv \lambda^{2} \langle \dot{b_{\omega}^{p}} \rangle_{0},
+\end{equation}
+\begin{equation} \label{eq:12}
+b_{\omega}^{p}(t) = \int_0^t ds \int_0^t ds'  e^{i(\omega + p\Omega)(s'-s)}B(s,s'),
+\end{equation}
+\begin{equation} \label{eq:13}
+\mathcal{B}_{\omega}^{p}(t) = \int_0^t ds \int_0^s ds'  e^{i(\omega + p\Omega)(s'-s)}B(s,s').
+\end{equation}
+Note that $B(s,s') = B(s-s')$ is no longer a delta function, but defined by the bath. \\
+ Let $\tau = s'-s$ and  $e^{i(\omega + p\Omega)\tau}B(\tau) \equiv F(\tau)$, 
+
+\begin{align}
+b_{\omega}^{p}(t)/t &= \frac{1}{t}\int_{-t}^0 d\tau \int_{-\tau}^t ds\: F(\tau) + \frac{1}{t}\int_{0}^t d\tau \int_{0}^{t-\tau} ds\: F(\tau) \\
+		             &= \frac{1}{t}\int_{-t}^0 d\tau (t+\tau) F(\tau) + \frac{1}{t}\int_{0}^t d\tau (t-\tau) F(\tau) \\
+                             &= \int_{-t}^t d\tau (1-|\tau|/t) F(\tau).
+\end{align}
+Taking the $t \to \infty$ limit, 
+\begin{equation} \label{eq:14}
+ \lim_{t \to +\infty} b_{\omega}^{p}(t) = t\int_{-\infty}^\infty d\tau e^{i(\omega + p\Omega)\tau}B(\tau).
+\end{equation}
+Now consider $\mathcal{B}_{\omega}^{p}(t)$,
+
+\begin{align} 
+\mathcal{B}_{\omega}^{p}(t)/t &= \frac{1}{t}\int_{-t}^0 d\tau \int_{-\tau}^t ds\: F(\tau) \\
+		             &= \int_{-t}^0 d\tau (1+\tau/t) F(\tau).                           
+\end{align}
+Again, taking the $t \to \infty$ limit,
+\begin{equation} \label{eq:15}
+\lim_{t \to +\infty}\mathcal{B}_{\omega}^{p}(t) =  t\int_{-\infty}^0 d\tau e^{i(\omega + p\Omega)\tau}B(\tau).
+\end{equation}
+If $B(s-s')=B(|s-s')$ which I have already assumed, then $H_{LS}$ and $\gamma_{\omega}^{p}$ can be written in terms of cosine fourier transforms, which are simple to evaluate. 
+
+
+
+
+
+
+\section{Transformation back to the Schrodinger picture}
+ Equation \ref{eq:11} is in the interaction picture, where $\tilde{\rho}(t) =  U^{\dagger}_{S}(t)\rho(t)U_{S}(t)$. Differentiating this expression leads to the following general relationship between $\tilde{\rho}(0)$ and $\rho(t)$,
+\begin{equation} \label{eq:16}
+\frac{d\rho}{dt} = -i[H_{S},\rho] + U_{S}(t)\frac{d\tilde{\rho}(t)}{dt}U^{\dagger}_{S}(t).
+\end{equation}
+Substituting \ref{eq:11} into \ref{eq:16} leads to the following
+\begin{equation}\label{eq:23}
+\frac{d\rho}{dt} = -i[H_{S}+H_{LS},\rho] +\mathcal{L}(t)\rho,
+\end{equation}
+where 
+\begin{equation}
+\mathcal{L}(t) = U_{S}(t)\mathcal{L} U^{\dagger}_{S}(t),
+\end{equation}
+\begin{equation}
+\mathcal{L}\rho =  \sum_{\omega}\sum_{p}\gamma_{\omega}^{p} \bigg[A_{p\omega}\tilde{\rho}(t)A_{p\omega}^{\dagger} - \frac{1}{2}\{A_{p\omega}^{\dagger}A_{p\omega},\tilde{\rho}(t)\}\bigg].
+\end{equation}
+To obtain this I have assumed $[H_{LS},H_{S}] = 0$. It can be shown that this takes the same form in both pictures, with the only modification being $H_{LS}\rightarrow H_{LS}+H_{S}$ and $\tilde{\rho}(t)\rightarrow\rho(t)$ when going from the interaction picture to the schrodinger picture. I.e, equation \ref{eq:23} takes on the familar form,
+\begin{align}
+\frac{d\rho}{dt} &= -i[H_{S}+H_{LS},\rho] + \sum_{\omega}\sum_{p}\gamma_{\omega}^{p} \bigg[A_{p\omega}\rho(t)A_{p\omega}^{\dagger} - \frac{1}{2}\{A_{p\omega}^{\dagger}A_{p\omega},\rho(t)\}\bigg] \\
+&= \mathcal{L}^{\rm tot}\rho(t)
+\end{align}
+See below for a proof of this.
+\newpage
+
+
+
+
+
+
+\subsection{Showing  $[H_{LS},H_{S}] = 0$}
+It is useful to split $H_{LS}$ into its operator and non-operator components, i.e.
+\begin{equation}
+H_{LS} =   \sum_{\omega}\sum_{p}\eta_{\omega}^{p}(t) A_{p\omega}^{\dagger}A_{p\omega},
+\end{equation}
+where $\eta_{\omega}^{p}(t)$ is a number that can be read off using equations \ref{eq:17} and \ref{eq:18}, which trivially commutes with $H_{S}$. 
+
+Consider 
+\begin{align} \label{eq:21}
+H_{S}A_{p\omega}^{\dagger}A_{p\omega} &= H_{S} \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \bra{\Phi_{a}(0)}A^{\dagger}\ket{\Phi_{b}(0)}\ket{\Phi_{a}^{q}}\bra{\Phi_{b}^{q'}} \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{c} = \omega}  \bra{\Phi_{c}(0)}A\ket{\Phi_{d}(0)}\ket{\Phi_{c}^{h}}\bra{\Phi_{d}^{h'}} \\
+							         &= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{c} = \omega}  H_{S}\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A^{\dagger}\ket{\Phi_{b}(0)}\bra{\Phi_{b}^{q'}}\bra{\Phi_{c}(0)}A\ket{\Phi_{d}(0)}\ket{\Phi_{c}^{h}}\bra{\Phi_{d}^{h'}}.
+\end{align}
+
+\begin{equation} \label{eq:22}
+A_{p\omega}^{\dagger}A_{p\omega}H_{S} = \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{c}-\epsilon_{d} = \omega}  \ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A^{\dagger}\ket{\Phi_{b}(0)}\bra{\Phi_{b}^{q'}}\bra{\Phi_{c}(0)}A\ket{\Phi_{d}(0)}\ket{\Phi_{c}^{h}}\bra{\Phi_{d}^{h'}}H_{S}.
+\end{equation}
+
+Consider the instantaneous time independent schrodinger equation, of which the solution to the time dependent schrodinger equation instantanteously coincides with\footnote{The solution to the TDSE will satisfy an instantaneous TISE, but the solutions to a later instantaneous TISE are not neccessarily correlated to this solution (The hamiltonian will be different so the two hilbert spaces of the two instantanous hamiltonians $H_{S}(t_{1})$ and $H_{S}(t_{2})$ will be different.} We can therefore say that $\Psi_{\alpha}(t)$ (solution to \ref{eq:2}) satisfies
+\begin{equation}
+H_{S}(t)\Psi_{\alpha}(t) = E_{\alpha}(t) \Psi_{\alpha}(t), 
+\end{equation}
+where $H_{S}(t)$ is hermitian so $E_{\alpha}(t)$ is real. Decomposing $\Psi_{\alpha}(t)$ into its fourier components leads to
+\begin{equation} \label{eq:20}
+H_{S}(t)\bigg[e^{-i\epsilon t/\hbar}\sum_{q \in\mathbb{Z}}e^{iq\Omega t} \ket{\Phi_{\alpha}^{q}} \bigg]  = E_{\alpha}(t)\bigg[e^{-i\epsilon t/\hbar}\sum_{q \in\mathbb{Z}}e^{iq\Omega t} \ket{\Phi_{\alpha}^{q}}   \bigg].
+\end{equation}
+In the documentation for qutip on page 99, they give the following two lines:
+\begin{equation}
+U(T+t,t)e^{-i\epsilon t/\hbar}\Phi_{\alpha}(t) = e^{-i\epsilon (T+t)/\hbar}\Phi_{\alpha}(T+t),
+\end{equation}
+\begin{equation}
+U(T+t,t)\Phi_{\alpha}(t) = e^{-i\epsilon (T)/\hbar}\Phi_{\alpha}(T).
+\end{equation}
+This implies that 
+\begin{equation}
+[U(T+t,t),e^{i\theta t}] = 0.
+\end{equation}
+I don't know if this helps, I can't find a way to show that $[H_{S}(t),e^{i\theta t}] = 0$. It may not be true, but if it is true then  $[H_{LS},H_{S}] = 0$ follows as is shown now.
+Assuming that $H_{S}(t)$ is chosen such that $[H_{S}(t),e^{i\theta t}] = 0$, equation \ref{eq:20} can be written as
+\begin{equation}
+\sum_{q \in\mathbb{Z}}e^{iq\Omega t} H_{S}(t)\ket{\Phi_{\alpha}^{q}} =\sum_{q \in\mathbb{Z}}e^{iq\Omega t} E_{\alpha}(t)\ket{\Phi_{\alpha}^{q}}.
+\end{equation}
+Therefore,
+\begin{equation}
+H_{S}(t)\ket{\Phi_{\alpha}^{q}} = E_{\alpha}(t)\ket{\Phi_{\alpha}^{q}}.
+\end{equation}
+Substituting this result into equation \ref{eq:21} and \ref{eq:22} leads to 
+\begin{equation}
+[H_{S},H_{LS}] =  \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{c} = \omega}\bigg[(E_{a}(t)-E_{d}(t))\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A^{\dagger}\ket{\Phi_{b}(0)}\bra{\Phi_{b}^{q'}}\ket{\Phi_{c}^{h}}\bra{\Phi_{c}(0)}A\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h'}}\bigg].
+\end{equation}
+As $H_{S}(t)$ is hermitian, $\bra{\Phi_{b}^{q'}}\ket{\Phi_{c}^{h}} = \delta_{bc}$ which leads to 
+\begin{align}
+[H_{S},H_{LS}] &=  \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{b} = \omega}\bigg[(E_{a}(t)-E_{d}(t))\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A^{\dagger}\ket{\Phi_{b}(0)}\bra{\Phi_{b}(0)}A\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h'}}\bigg] \\
+                      &= 0.
+\end{align}
+where the last equality follows from $\epsilon_{a}-\epsilon_{b} = \omega = \epsilon_{d}-\epsilon_{b} \implies a=d$ and so $E_{a}(t)-E_{d}(t)=0$.
+
+
+
+
+
+
+
+
+\subsection{Evaluating $\mathcal{L}(t)$}
+\begin{align} \label{eq:24}
+\mathcal{L}(t) &= U_{S}(t)\sum_{\omega}\sum_{p}\gamma_{\omega}^{p} \bigg[A_{p\omega}\tilde{\rho}(t)A_{p\omega}^{\dagger} - \frac{1}{2}\{A_{p\omega}^{\dagger}A_{p\omega},\tilde{\rho}(t)\}\bigg] U^{\dagger}_{S}(t) \\
+&= \sum_{\omega}\sum_{p}\gamma_{\omega}^{p} \bigg[U_{S}(t)A_{p\omega}U^{\dagger}_{S}(t)\rho(t)U_{S}(t)A_{p\omega}^{\dagger}U^{\dagger}_{S}(t) - \frac{1}{2}U_{S}(t)A_{p\omega}^{\dagger}A_{p\omega}U^{\dagger}_{S}(t)\rho(t)-\frac{1}{2}\rho(t)U_{S}(t)A_{p\omega}^{\dagger}A_{p\omega}U^{\dagger}_{S}(t)\bigg],
+\end{align}
+where $U_{S}(t)U^{\dagger}_{S}(t)=1$ has been used.
+%If $[U_{S}(t),A_{p\omega}] = 0$ then $\mathcal{L}(t)$ will take the form of $\mathcal{L}$ with $\tilde{\rho}(t)\rightarrow \rho(t)$. Consider
+
+\begin{equation}
+U_{S}(t)A_{p\omega} = \sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  U_{S}(t)\ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}},
+\end{equation}
+\begin{equation}
+A_{p\omega}U_{S}(t)= \sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  \ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}}U_{S}(t)
+\end{equation}
+To evaluate $U_{S}(t)\ket{\Phi_{\alpha}^{q}}$ and $\bra{\Phi_{\beta}^{q'}}U_{S}(t)$, we substitute equation \ref{eq:4} into \ref{eq:3} which gives
+\begin{equation}
+U_{S}(t)\ket{\Phi_{\alpha}(0)} =  U_{S}(t)\sum_{q \in\mathbb{Z}}  \ket{\Phi_{\alpha}^{q}} =  \rm exp(-i\epsilon_{\alpha}t/\hbar) \sum_{q \in\mathbb{Z}}\rm  e^{iq\Omega t}  \ket{\Phi_{\alpha}^{q}}   
+\end{equation}
+which implies 
+\begin{equation} \label{eq:24}
+U_{S}(t)\ket{\Phi_{\alpha}^{q}} =  e^{-i(\epsilon_{\alpha}/\hbar-q\Omega)t} \ket{\Phi_{\alpha}^{q}}, 
+\end{equation}
+\begin{equation}
+\bra{\Phi_{\beta}^{q'}}U_{S}(t)= \bra{\Phi_{\beta}^{q'}} e^{-i(\epsilon_{\beta}/\hbar-q'\Omega)t}.
+\end{equation}
+Note that equation \ref{eq:24} implies that $\bra{\Phi_{\beta}^{q'}}\ket{\Phi_{\alpha}^{q}} = \delta_{\alpha\beta}\delta_{qq'}$ as they are eigenvectors of a unitary matrix $U_{S}(t)$. This leads to
+\begin{align}
+U_{S}(t)A_{p\omega}U_{S}^{\dagger}(t) &= \sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  U_{S}(t)\ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}}U_{S}^{\dagger}(t), \\
+&= \sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega} e^{-i(\epsilon_{\alpha}/\hbar+q\Omega)t}e^{i(\epsilon_{\beta}/\hbar+q'\Omega)t}  \ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}} \\
+&=e^{-i(\omega+p\Omega)t} A_{p\omega},
+\end{align}
+Therefore
+\begin{align}
+U_{S}(t)A_{p\omega}U^{\dagger}_{S}(t)\rho(t)U_{S}(t)A_{p\omega}^{\dagger}U^{\dagger}_{S}(t) &= e^{-i(\omega+p\Omega)t} A_{p\omega}\rho(t)e^{i(\omega+p\Omega)t} A^{\dagger}_{p\omega} \\
+&= A_{p\omega}\rho(t)A^{\dagger}_{p\omega}.
+\end{align}
+\begin{align}
+U_{S}(t)A_{p\omega}A_{p\omega}^{\dagger}U_{S}^{\dagger}(t) &= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{c} = \omega} U_{S}(t)\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A\ket{\Phi_{b}(0)}\bra{\Phi_{b}^{q'}}\ket{\Phi_{c}^{h'}}\bra{\Phi_{c}(0)}A^{\dagger}\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h}}U_{S}^{\dagger}(t) \\
+&= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-q' = p} \sum_{\epsilon_{d}-\epsilon_{b} = \omega} U_{S}(t)\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A\ket{\Phi_{b}(0)}\bra{\Phi_{b}(0)}A^{\dagger}\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h}}U_{S}^{\dagger}(t) \\
+&= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-q' = p} \sum_{\epsilon_{d}-\epsilon_{b} = \omega}e^{-i(\epsilon_{a}/\hbar+q\Omega)t}e^{i(\epsilon_{d}/\hbar+h\Omega)t}\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A\ket{\Phi_{b}(0)}\bra{\Phi_{b}(0)}A^{\dagger}\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h}} \\
+&= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega} \ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A\ket{\Phi_{b}(0)}\bra{\Phi_{b}(0)}A^{\dagger}\ket{\Phi_{a}(0)}\bra{\Phi_{a}^{q}} \\
+&= A_{p\omega}A_{p\omega}^{\dagger}.
+\end{align}
+The second line follows from $\bra{\Phi_{\beta}^{q'}}\ket{\Phi_{\alpha}^{q}} = \delta_{\alpha\beta}\delta_{qq'}$ where $h'\rightarrow q'$, $\epsilon_{c}\rightarrow\epsilon_{b}$, and fourth line from the summation conditions.
+Putting all this together leads to the time dependent Lindblad equation in the schrodinger picture,
+\begin{equation}
+\frac{d\rho}{dt} = -i[H_{S}+H_{LS},\rho] + \sum_{\omega}\sum_{p}\gamma_{\omega}^{p} \bigg[A_{p\omega}\rho(t)A_{p\omega}^{\dagger} - \frac{1}{2}\{A_{p\omega}^{\dagger}A_{p\omega},\rho(t)\}\bigg].
+\end{equation}
+
+
+
+\subsection{Notes}
+The reason for the dimension of the density matrix is $4^{N}$ for N spins in a spin chain is because there are effectively 2N spins, each with 2 directions so dimension is $2^{2N} = 4^N$. The reason the block diagonal of quantum number M (relating to the total z magnetization) has dimensions ${2N\choose M} \times {2N\choose M}$ is because M represents the number of spins that aren't pointing up (or aren't pointed down) and the are ${2N\choose M}$ ways to have this. \\
+Equation \ref{eq:24} implies that for values of t such that $2\pi/\Omega t \not\in \mathbb{Z}$ each $\ket{\Phi_{\alpha}^{q}}$ is non-degenerate. So far, there have been no bounds on the number of possible q's, but this places an upper limit of the dimension of the hilbert space. There can't be more q's than this as $U_{S}(t)$ can't have more distinct eigenvectors than its dimension. This implies that the set $\{\ket{\Phi_{\alpha}^{q}}\}$ forms a complete basis at such times, and at other times serves as an "incomplete" basis where they become degenerate. 
+
+
+
+\section{kicked Ising Model}
+We consider the Floquet Ising spin-1/2 chain with transverse and longitudinal fields,
+\begin{equation}
+H_{S}(t) = \sum_{j=1}^N J\sigma_{j}^{z}\sigma_{j+1}^{z} + h_{j}\sigma_{j}^{z} +\delta_{\tau}(t)\:b\sigma_{j}^{x},
+\end{equation}
+\begin{equation}
+\delta_{\tau}(t) = \sum_{m=-\infty}^{\infty} \delta(t-m\tau),
+\end{equation}
+where N is the number of particles in the chain. We express the Liouvillian superoperator $\mathcal{L}^{\rm tot}$ in terms of a $4^N \times 4^N$ matrix representation acting on a $4^N$ dimensional density operator $\rho$,
+\begin{equation} \label{eq:25}
+\begin{aligned}
+\mathcal{L}^{\rm tot} &= \rm -i\bigg\{\bigg(H_{S}(t)+H_{LS}-\frac{i}{2}\sum_{\omega}\sum_{p}\gamma_{\omega}^{p}A_{p\omega}^{\dagger}A_{p\omega}\bigg)\otimes\mathds{1} \\ 
+&-\mathds{1}\otimes\bigg(H_{S}(t)+H_{LS}+\frac{i}{2}\sum_{\omega}\sum_{p}\gamma_{\omega}^{p}A_{p\omega}^{\dagger}A_{p\omega}\bigg)^{T}\bigg\} + \sum_{\omega}\sum_{p}\gamma_{\omega}^{p}A_{p\omega}\otimes A_{p\omega}^{\dagger}.
+\end{aligned}
+\end{equation}
+
+We make the assumption that $B(s,s') = \delta(s-s')$ which has the following implications;
+\begin{equation}
+b_{\omega}^{p}(t)/t  = B,
+\end{equation}
+
+\begin{equation}
+\mathcal{B}_{\omega}^{p}(t)/t = \mathcal{B}_{\omega}^{p\:*}(t) /t = B/2,
+\end{equation}
+where B is a constant. This means
+\begin{equation}
+H_{LS} = 0,
+\end{equation}
+
+\begin{equation}
+\gamma_{\omega}^{p}= \lambda^{2}B.
+\end{equation}
+
+
+
+
+
+\subsection{Issues}
+To diagonalise equation \ref{eq:25}, the Floquet eigenvectors and eigenvalues are needed (equation \ref{eq:19}) and their fourier components, $\ket{\Phi_{\alpha}^{q}}$. The Floquet eigenvectors and eigenvalues can be found by diagonalising the 1 period propagator as they satisfy
+\begin{equation} \label{eq:26}
+U_{S}(\Theta,0)\Phi_{\alpha}(0) = \rm exp(-i\epsilon_{\alpha}\Theta/\hbar)\Phi_{\alpha}(0).
+\end{equation}
+for the fourier components, recall equation \ref{eq:24}
+\begin{equation} \label{eq:24}
+U_{S}(t)\ket{\Phi_{\alpha}^{q}} =  e^{-i(\epsilon_{\alpha}/\hbar-q\Omega)t} \ket{\Phi_{\alpha}^{q}}. 
+\end{equation}
+If $t = n\Theta$ where n is an integer then \ref{eq:24} reduces to \ref{eq:26}\footnote{with $\Theta \rightarrow n\Theta$.} as $ e^{-iqn\Omega\Theta}=e^{-2iqn\pi}=1 $, i.e  $\ket{\Phi_{\alpha}^{q}}$ are degenerate in q for this operator. However \ref{eq:24} implies that for values of t such that $2\pi/\Omega t \not\in \mathbb{Q}$ each $ \ket{\Phi_{\alpha}^{q}}$ is non degenerate, each $ e^{-i(\epsilon_{\alpha}/\hbar+q\Omega)t}$ is unique for a given $\alpha$ and q\footnote{This ignores any possible degeneracies from certain combinations.}. This places an upper limit to the number of possible q's, as $U_{S}(t)$ can't have more linearly independent eigenvectors than its dimension. This is what I think the paper "Internal consistency of fault-tolerant etc" (Phys rev A 73 052311 (2006)) means by the comment below equation 33.  This implies that $ \ket{\Phi_{\alpha}^{q}} $ can be found by diagonalising $U_{S}(t)$ for such a value of t. However this leads to the following inconsistency between equations \ref{eq:24} and \ref{eq:26}. The Floquet solutions $\Psi_{\alpha}(t)$ form a basis so there must be the same number of basis functions $\{\Psi_{\alpha}(t)\}$ as the dimension of the hilbert space (N). $U_{S}(t)$ must also have the same number of eigenvectors with distinct eigenvalues but
+if for each $\alpha$ and q there is a unique eigenvalue that implies $N^2$ independent states which can't be true\footnote{This uses the fact that eigenvectors of a unitary operator corresponding to distinct eigenvalues are orthogonal.}. Even if there was some degeneracy for certain combinations, it would still be greater than N. This is the main problem I'm having with finding the $\ket{\Phi_{\alpha}^{q}}$ states explicitly.
+
+
+
+
+
+
+
+\subsection{Potential solution}
+To resolve  $\ket{\Phi_{\alpha}^{q}}$, first consider its definition,
+\begin{equation} \label{eq:27}
+\ket{\Phi_{\alpha}(t)} = \sum_{q \in\mathbb{Z}}  \ket{\Phi_{\alpha}^{q}} \rm  e^{iq\Omega t},
+\end{equation}
+where $\ket{\Phi_{\alpha}(t)}$ can be easily evaluated by using equation \ref{eq:3}. Consider the definition of the 1-D discrete Fourier transform from the documentation of scipy:"The FFT y[k] of length N of the length-N sequence x[n] is defined as 
+\begin{equation} \label{eq:28}
+y[k] = \sum_{n=0}^{N-1}e^{-2\pi i \frac{kn}{N}}x[n],
+\end{equation}
+and the inverse is defined as follows"
+\begin{equation} \label{eq:29}
+x[n] = \frac{1}{N}\sum_{n=0}^{N-1}e^{2\pi i \frac{kn}{N}}y[k].
+\end{equation}
+We can rewrite equation \ref{eq:27} in a similar form by discretizing the time into a 1D array of length N where $t[n]=n\Delta t$, and recalling that $\Omega =2\pi/\Theta$\footnote{$\Theta=N\Delta t$},
+\begin{equation} \label{eq:30}
+\ket{\Phi_{\alpha}(t=n\Delta t)} = \sum_{q \in\mathbb{Z}} \rm  e^{2i\pi \frac{qn}{N}}\ket{\Phi_{\alpha}^{q}}.
+\end{equation}
+The only difference between \ref{eq:29} and \ref{eq:30} is the range of the summation. However, the limit of \ref{eq:29} should also apply to \ref{eq:30} when $\Phi_{\alpha}(t)$ is discretized as 
+\begin{equation}
+e^{2i\pi \frac{(q+N)n}{N}} = e^{2i\pi \frac{qn}{N}},
+\end{equation} 
+these higher modes are indistinct when t is is discretized, anologous to different Brillouin zones in lattice structures. Using this leads to 
+\begin{equation}
+\ket{\Phi_{\alpha}(t=n\Delta t)} =\rm N \mathcal{F}^{-1}\{\ket{\Phi_{\alpha}^{q}}\},
+\end{equation}
+and thus 
+\begin{equation}
+\ket{\Phi_{\alpha}^{q}} = \mathcal{F}\{\ket{\Phi_{\alpha}(t=n\Delta t)}/N\},
+\end{equation}
+where $\mathcal{F}$ and $\mathcal{F}^{-1}$ are the fast fourier transform and inverse fast fourier transform respectively, defined in equations \ref{eq:28} and \ref{eq:29}.
+
+
+
+%\begin{equation}
+
+%U_{S}(t)A_{p\omega}A_{p\omega}^{\dagger}U^{\dagger}_{S}(t)%&= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{c} = \omega}   U_{S}(t)\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A\ket{\Phi_{b}(0)}\bra{\Phi_{b}^{q'}}\ket{\Phi_{c}^{h}}\bra{\Phi_{c}(0)}A\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h'}}U^{\dagger}_{S}(t) 
+%\end{equation}
+
+%U_{S}(t)A_{p\omega}A_{p\omega}^{\dagger}U^{\dagger}_{S}(t)&= \sum_{q-q' = p} \sum_{\epsilon_{a}-\epsilon_{b} = \omega}  \sum_{h-h' = p} \sum_{\epsilon_{d}-\epsilon_{c} = \omega}   U_{S}(t)\ket{\Phi_{a}^{q}}  \bra{\Phi_{a}(0)}A\ket{\Phi_{b}(0)}\bra{\Phi_{b}^{q'}}\ket{\Phi_{c}^{h}}\bra{\Phi_{c}(0)}A\ket{\Phi_{d}(0)}\bra{\Phi_{d}^{h'}}U^{\dagger}_{S}(t) 
+
+
+
+%\begin{align}
+%[U_{S}(t),A_{p\omega}]  &= \sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  \bigg[U_{S}(t)\ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}} - \ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}}U_{S}(t)\bigg] \\
+
+%&= \sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  (e^{-i(\epsilon_{\alpha}/\hbar+q\Omega)t}- e^{-i(\epsilon_{\beta}/\hbar+q'\Omega)t}) \ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}} \\
+
+%&=\sum_{q-q' = p} \sum_{\epsilon_{\alpha}-\epsilon_{\beta} = \omega}  e^{-i(\epsilon_{\alpha}/\hbar+q\Omega)t}(1- e^{i(\omega+p\Omega)t}) \ket{\Phi_{\alpha}^{q}}\bra{\Phi_{\alpha}(0)}A\ket{\Phi_{\beta}(0)}\bra{\Phi_{\beta}^{q'}}
+%\end{align}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
